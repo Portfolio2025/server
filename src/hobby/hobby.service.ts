@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHobbyDto, CreateHobbySectionDto } from './dto/create-hobby.dto';
+import { CreateHobbyDto } from './dto/create-hobby.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hobby, Section, Content, TextBlock, Picture } from './entities/hobby.entity';
 import { Repository } from 'typeorm';
@@ -11,46 +11,46 @@ import * as path from 'path';
 export class HobbyService {
   constructor(
     @InjectRepository(Hobby)
-    private Hobby: Repository<Hobby>,
+    private hobbyRep: Repository<Hobby>,
     @InjectRepository(Section)
-    private Section: Repository<Section>,
+    private sectionRep: Repository<Section>,
     @InjectRepository(Content)
-    private Content: Repository<Content>,
+    private contentRep: Repository<Content>,
     @InjectRepository(TextBlock)
-    private TextBlock: Repository<TextBlock>,
+    private textRep: Repository<TextBlock>,
     @InjectRepository(Picture)
-    private Picture: Repository<Picture>,
+    private pictureRep: Repository<Picture>,
   ) { }
   async createHobby(createHobbyDto: CreateHobbyDto) {
-    const hobby = this.Hobby.create(createHobbyDto);
-    await this.Hobby.save(hobby);
+    const hobby = this.hobbyRep.create(createHobbyDto);
+    await this.hobbyRep.save(hobby);
   }
 
   async addSection(id:number, title:string) {
-    const hobby = await this.Hobby.findOne({ where: { id } });
+    const hobby = await this.hobbyRep.findOne({ where: { id } });
     if (!hobby) {
-      throw new Error(`Hobby with ID ${id} not found.`);
+      throw new Error(`hobbyRep with ID ${id} not found.`);
     }
 
-    const section = this.Section.create({ title, hobby });
-    await this.Section.save(section);
+    const section = this.sectionRep.create({ title, hobby });
+    await this.sectionRep.save(section);
     delete section.hobby
   }
 
   async addImage(sectionId:number, filename:string) {
-    const section = await this.Section.findOne({ where: { id: sectionId } });
+    const section = await this.sectionRep.findOne({ where: { id: sectionId } });
     if (!section) {
       // fs.unlink()
       const filePath = path.join(__dirname, '../..', 'public', 'imgs', filename)
       fs.unlinkSync(filePath)
-      throw new Error(`Section with ID ${sectionId} not found.`);
+      throw new Error(`sectionRep with ID ${sectionId} not found.`);
     }
-    const image = this.Picture.create({ path: filename, section });
-    await this.Picture.save(image)
+    const image = this.pictureRep.create({ path: filename, section });
+    await this.pictureRep.save(image)
   }
 
   async findAllHobbies() {
-    return await this.Hobby.find(
+    return await this.hobbyRep.find(
       {
         relations: ['sections', 'sections.content', 'sections.content.details', 'sections.pictures']
       }
@@ -58,13 +58,13 @@ export class HobbyService {
   }
 
   async findTabsNames() {
-    return await this.Hobby.find({
+    return await this.hobbyRep.find({
       select: ["id", "name"]
     });
   }
 
   async findOne(id: number) {
-    return await this.Hobby.findOne(
+    return await this.hobbyRep.findOne(
       {
         where: { id },
         relations: ['sections', 'sections.content', 'sections.content.details', 'sections.pictures']
@@ -73,12 +73,12 @@ export class HobbyService {
   }
 
   async update(id: number, hobbyDto: UpdateHobbyDto) {
-    const hobby = await this.Hobby.findOne({ where: { id } })
+    const hobby = await this.hobbyRep.findOne({ where: { id } })
     if (!hobby) {
-      throw new Error(`Hobby with ID ${id} not found.`);
+      throw new Error(`hobbyRep with ID ${id} not found.`);
     }
 
-    return await this.Hobby.update(hobby.id, {
+    return await this.hobbyRep.update(hobby.id, {
       id: hobby.id,
       ...hobbyDto
     })
@@ -97,29 +97,29 @@ export class HobbyService {
   }
 
   private async findHobbyById(id: number) {
-    const hobby = await this.Hobby.findOne({ where: { id } });
-    if (!hobby) throw new Error(`Hobby with ID ${id} not found.`);
+    const hobby = await this.hobbyRep.findOne({ where: { id } });
+    if (!hobby) throw new Error(`hobbyRep with ID ${id} not found.`);
   }
 
   private async findSectionById(sectionId: number) {
-    const section = await this.Section.findOne({ where: { id: sectionId } });
-    if (!section) throw new Error(`Section with ID ${sectionId} not found.`);
+    const section = await this.sectionRep.findOne({ where: { id: sectionId } });
+    if (!section) throw new Error(`sectionRep with ID ${sectionId} not found.`);
     return section;
   }
 
   private async createNewContent(section: Section, updateBody: UpdateSectionContentDto) {
-    const content = this.Content.create({ section, type: updateBody.contentType });
-    await this.Content.save(content);
+    const content = this.contentRep.create({ section, type: updateBody.contentType });
+    await this.contentRep.save(content);
 
     const detailsArray = updateBody.details.map(detail =>
-      this.TextBlock.create({ text: detail.text, content })
+      this.textRep.create({ text: detail.text, content })
     );
-    await this.TextBlock.save(detailsArray);
+    await this.textRep.save(detailsArray);
   }
 
   private async updateExistingContent(updateBody: UpdateSectionContentDto) {
-    const content = await this.Content.findOne({ where: { id: updateBody.contentId }, relations: ['details'] });
-    if (!content) throw new Error(`Content with ID ${updateBody.contentId} not found.`);
+    const content = await this.contentRep.findOne({ where: { id: updateBody.contentId }, relations: ['details'] });
+    if (!content) throw new Error(`contentRep with ID ${updateBody.contentId} not found.`);
 
     const existingTexts = content.details || [];
     const newTexts = updateBody.details;
@@ -140,11 +140,11 @@ export class HobbyService {
       if (existingText) {
         if (existingText.text !== frontDetail.text) {
           existingText.text = frontDetail.text;
-          await this.TextBlock.save(existingText);
+          await this.textRep.save(existingText);
         }
       } else {
-        const newText = this.TextBlock.create({ text: frontDetail.text, content });
-        await this.TextBlock.save(newText);
+        const newText = this.textRep.create({ text: frontDetail.text, content });
+        await this.textRep.save(newText);
       }
     }
   }
@@ -157,16 +157,16 @@ export class HobbyService {
       return !newTexts.some(newText => newText.id === existingText.id);
     });
     for (const text of textsToRemove) {
-      await this.TextBlock.delete({ id: text.id });
+      await this.textRep.delete({ id: text.id });
     }
   }
 
 
   async remove(id: number, type: "hobby" | "section" | "content") {
     const entityMap = {
-      hobby: this.Hobby,
-      section: this.Section,
-      content: this.Content,
+      hobby: this.hobbyRep,
+      section: this.sectionRep,
+      content: this.contentRep,
     };
 
     const repository = entityMap[type];

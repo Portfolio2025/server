@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telli pildile</title>
+</head>
+
+<body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 0px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul li {
+      margin: 5px 0;
+    }
+  </style>
+  <h2>Данные пользователя</h2>
+  <ul>
+    <li>Полное имя: <%= name %></li>
+    <li>Почта: <%= email %></li>
+    <li>Телефон: <%= phone %></li>
+    <li>Тип проекта: <%= projectType%></li>
+    <li>Бюджет: <%=budget%></li>
+  </ul>
+  <p><%= wish %></p>
+</body>
+
+</html>

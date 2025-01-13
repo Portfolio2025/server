@@ -9,24 +9,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class SkillService {
   constructor(
     @InjectRepository(SkillGroup)
-    private Group: Repository<SkillGroup>,
+    private groupRep: Repository<SkillGroup>,
     @InjectRepository(Skill)
-    private Skill: Repository<Skill>,
+    private skillRep: Repository<Skill>,
     @InjectRepository(ProjectLink)
-    private Link: Repository<ProjectLink>,
+    private linkRep: Repository<ProjectLink>,
   ) { }
   async createGroup(createSkillGroupDto: CreateSkillGroupDto) {
-    let group = this.Group.create(createSkillGroupDto)
-    return await this.Group.save(group);
+    let group = this.groupRep.create(createSkillGroupDto)
+    return await this.groupRep.save(group);
   }
   async addSkill(groupId: number, createSkillDto: CreateSkillDto) {
-    let group = await this.Group.findOne({ where: { id: groupId } })
+    let group = await this.groupRep.findOne({ where: { id: groupId } })
     if (!group) {
-      throw new Error(`Skill group with ID ${groupId} not found.`)
+      throw new Error(`skillRep group with ID ${groupId} not found.`)
     }
-    let skill = this.Skill.create(createSkillDto)
+    let skill = this.skillRep.create(createSkillDto)
     skill.group = group
-    return await this.Skill.save(skill)
+    return await this.skillRep.save(skill)
   }
 
   addLinks() {
@@ -34,7 +34,7 @@ export class SkillService {
   }
 
   async findAll() {
-    return await this.Group.find({
+    return await this.groupRep.find({
       relations: ['skills', 'skills.links']
     })
   }

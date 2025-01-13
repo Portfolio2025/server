@@ -10,9 +10,9 @@ async function bootstrap() {
   app.enableCors({
     origin: ['http://localhost:4200'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // разрешение отправлять куки
+    credentials: true,
   });
-  // app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 bootstrap();

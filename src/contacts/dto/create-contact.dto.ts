@@ -1,9 +1,9 @@
-import { IsAlphanumeric, IsEnum, IsNotEmpty, IsNumber, Matches } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Matches } from "class-validator";
 import { ContactsType } from "../entities/contact.entity";
 
 export class CreateContactDto {
     @IsNotEmpty()
-    @IsAlphanumeric()
+    @IsString()
     title: string;
 
     @IsNotEmpty()

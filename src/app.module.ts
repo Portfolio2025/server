@@ -5,15 +5,19 @@ import { HobbyModule } from './hobby/hobby.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SkillModule } from './skill/skill.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ProjectsModule } from './projects/projects.module';
+import * as path from 'path';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: `/${process.env.API_NAME}/static`,
@@ -29,13 +33,34 @@ import { ContactsModule } from './contacts/contacts.module';
         database: configService.get<string>("DB_NAME"),
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         synchronize: true,
-
       }),
       inject: [ConfigService]
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule], // подключаем ConfigModule для использования ConfigService
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          service: configService.get<string>('MAIL_SERVICE'), // получаем значения из конфигурации
+          port: configService.get<number>('MAIL_PORT'),
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: `<${configService.get<string>('MAIL_USER')}>`,
+        },
+        template: {
+          dir: path.resolve(__dirname, '../templates'),
+          adapter: new EjsAdapter(),
+        },
+      }),
+      inject: [ConfigService], // инжектируем ConfigService
+    }),
     HobbyModule,
     SkillModule,
-    ContactsModule],
+    ContactsModule,
+    ProjectsModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -4,23 +4,28 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contacts } from './entities/contact.entity';
+import { SendEmailDto } from './dto/send-email.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ContactsService {
   constructor(
     @InjectRepository(Contacts)
-    private Contacts: Repository<Contacts>
+    private contactsRep: Repository<Contacts>,
+    private readonly mailerService: MailerService,
+    private readonly configService: ConfigService
   ) { }
   async create(createContactDto: CreateContactDto, fileName:string) {
-    const contact = this.Contacts.create({
+    const contact = this.contactsRep.create({
       ...createContactDto,
       icon: fileName
     })
-    await this.Contacts.save(contact)
+    await this.contactsRep.save(contact)
   }
 
   async findAll() {
-    return await this.Contacts.find()
+    return await this.contactsRep.find()
   }
 
   findOne(id: number) {
@@ -33,5 +38,13 @@ export class ContactsService {
 
   remove(id: number) {
     return `This action removes a #${id} contact`;
+  }
+  async sendEmail(form: SendEmailDto) {
+    await this.mailerService.sendMail({
+      to: this.configService.get<string>('MAIL_USER'),
+      subject: `Контактная форма с портфолио`,
+      template: 'contact',
+      context: form
+    });
   }
 }
