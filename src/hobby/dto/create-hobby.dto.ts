@@ -1,57 +1,62 @@
-import { IsAlpha, IsEnum, IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsAlpha, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ContentType } from '../entities/hobby.entity';
 
+// DTO for creating a hobby
 export class CreateHobbyDto {
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty() // Ensures the name is not empty
+    @IsString() // Ensures the name is a string
     name: string
 
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty() // Ensures the explanation is not empty
+    @IsString() // Ensures the explanation is a string
     explanation: string
 }
 
+// DTO for creating a hobby section
 export class CreateHobbySectionDto {
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty() // Ensures the title is not empty
+    @IsString() // Ensures the title is a string
     title: string
 
-    @IsNumber()
+    @IsNumber() // Ensures the order is a number
     order?: number
 }
 
+// DTO for creating section content
 export class CreateSectionContentDto {
-    @IsNotEmpty()
-    @IsEnum(ContentType)
+    @IsNotEmpty() // Ensures the type is not empty
+    @IsEnum(ContentType) // Ensures the type is a valid enum value
     type: ContentType
 
-    @IsNumber()
+    @IsNumber() // Ensures the order is a number
     order?: number
 
-    @IsNotEmpty()
-    @IsNumber()
+    @IsNotEmpty() // Ensures the sectionId is not empty
+    @IsNumber() // Ensures the sectionId is a number
     sectionId: number
 }
 
+// DTO for creating content text
 export class CreateContentTextDto {
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty() // Ensures the text is not empty
+    @IsString() // Ensures the text is a string
     text: string
 
-    @IsNumber()
+    @IsNumber() // Ensures the order is a number
     order?: number
 
-    @IsNotEmpty()
-    @IsNumber()
+    @IsNotEmpty() // Ensures the contentId is not empty
+    @IsNumber() // Ensures the contentId is a number
     contentId: number
 }
 
+// DTO for creating section images
 export class CreateSectionImagesDto {
-    @IsNotEmpty()
-    @IsAlpha()
+    @IsNotEmpty() // Ensures the path is not empty
+    @IsAlpha() // Ensures the path contains only alphabetic characters
     path: string
 
-    @IsNotEmpty()
-    @IsNumber()
+    @IsNotEmpty() // Ensures the sectionId is not empty
+    @IsNumber() // Ensures the sectionId is a number
     sectionId: number
 }

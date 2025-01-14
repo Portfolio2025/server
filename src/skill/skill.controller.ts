@@ -7,30 +7,37 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 export class SkillController {
   constructor(private readonly skillService: SkillService) {}
 
+  // Create a new skill group
   @Post("/group")
   createGroup(@Body() createSkillGroupDto: CreateSkillGroupDto) {
     return this.skillService.createGroup(createSkillGroupDto);
   }
+
+  // Add a new skill to a specific group
   @Post("/:groupId")
-  createSkill(@Param("groupId") id:number, @Body() createSkillDto: CreateSkillDto) {
+  createSkill(@Param("groupId") id: number, @Body() createSkillDto: CreateSkillDto) {
     return this.skillService.addSkill(id, createSkillDto);
   }
 
+  // Retrieve all skills
   @Get()
   findAll() {
     return this.skillService.findAll();
   }
 
+  // Retrieve a specific skill by ID
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.skillService.findOne(+id);
   }
 
+  // Update a specific skill by ID
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
     return this.skillService.update(+id, updateSkillDto);
   }
 
+  // Remove a specific skill by ID
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.skillService.remove(+id);

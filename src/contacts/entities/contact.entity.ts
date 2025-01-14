@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+// Enum for contact types
 export enum ContactsType {
     text = "text",
     link = "link"
@@ -8,10 +9,10 @@ export enum ContactsType {
 @Entity()
 export class Contacts {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number; // Primary key
 
     @Column({ nullable: false })
-    title: string;
+    title: string; // Title of the contact
 
     @Column({
         type: 'enum',
@@ -19,20 +20,20 @@ export class Contacts {
         default: ContactsType.text,
         nullable: false
     })
-    type: ContactsType
+    type: ContactsType; // Type of the contact (text or link)
 
     @Column({ type: "text", nullable: false })
-    link: string;
+    link: string; // Link associated with the contact
 
     @Column({ type: "text", nullable: false })
-    icon: string;
+    icon: string; // Icon associated with the contact
 
     @Column({ default: 0 })
-    order: number
+    order: number; // Order of the contact
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt: Date; // Timestamp of when the contact was created
 
     @UpdateDateColumn()
-    updatedAt: Date;
+    updatedAt: Date; // Timestamp of when the contact was last updated
 }

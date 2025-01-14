@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
+// Enum for content types
 export enum ContentType {
     list = "list",
     text = "text",
@@ -21,6 +22,7 @@ export class Hobby {
     })
     order: number
 
+    // One-to-many relationship with Section
     @OneToMany(() => Section, section => section.hobby, { cascade: true })
     sections: Section[];
 
@@ -42,13 +44,16 @@ export class Section {
     @Column({ default: 0 })
     order: number
 
+    // Many-to-one relationship with Hobby
     @ManyToOne(() => Hobby, hobby => hobby.sections, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'hobby_id' })
     hobby: Hobby;
 
+    // One-to-many relationship with Content
     @OneToMany(() => Content, content => content.section, { cascade: true })
     content: Content[];
 
+    // One-to-many relationship with Picture
     @OneToMany(() => Picture, picture => picture.section, { cascade: true })
     pictures: Picture[]; 
 
@@ -74,10 +79,12 @@ export class Content {
     @Column({ default: 0 })
     order: number
 
+    // Many-to-one relationship with Section
     @ManyToOne(() => Section, section => section.content, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'section_id' })
     section: Section;
 
+    // One-to-many relationship with TextBlock
     @OneToMany(() => TextBlock, text => text.content, { cascade: true })
     details: TextBlock[];
 
@@ -99,6 +106,7 @@ export class TextBlock {
     @Column({ default: 0 })
     order: number
 
+    // Many-to-one relationship with Content
     @ManyToOne(() => Content, content => content.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'content_id' })
     content: Content;
@@ -112,6 +120,7 @@ export class Picture {
     @Column()
     path: string;
 
+    // Many-to-one relationship with Section
     @ManyToOne(() => Section, hobbySection => hobbySection.pictures, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'section_id' })
     section: Section;
