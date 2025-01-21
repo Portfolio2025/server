@@ -9,7 +9,11 @@ import { Hobby, Section, Content, TextBlock, Picture } from './entities/hobby.en
   providers: [HobbyService],
   imports: [
     TypeOrmModule.forFeature([
-      Hobby, Section, Content, TextBlock, Picture
+      Hobby,
+      Section,
+      Content,
+      TextBlock,
+      Picture,
     ])
   ]
 })

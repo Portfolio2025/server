@@ -1,14 +1,18 @@
-import { IsArray, IsBoolean, IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateProjectDto {
 
     @IsString()
     @IsNotEmpty()
-    projectName: string
+    name: string
 
     @IsString()
     @IsNotEmpty()
-    projectLink: string
+    type: string
+
+    @IsString()
+    @IsNotEmpty()
+    link: string
 
     @IsString()
     @IsNotEmpty()
@@ -17,8 +21,8 @@ export class CreateProjectDto {
     @IsArray()
     @IsNotEmpty()
     technologies: string[];
+}
 
-    @IsBoolean()
-    @IsNotEmpty()
-    status: boolean;
+export class AddImageDto{
+    projectImagePath: string;
 }

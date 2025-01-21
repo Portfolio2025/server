@@ -36,7 +36,6 @@ export class HobbyController {
   async assImage(
     @Param("id") sectionId: number,
     @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response
   ) {
     await this.hobbyService.addImage(sectionId, file.filename);
   }

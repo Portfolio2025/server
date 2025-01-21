@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Project {
@@ -6,12 +6,16 @@ export class Project {
     id: number
 
     @Column()
-    projectName: string
+    name: string
 
-    @Column({
-        type: "text"
-    })
-    projectLink: string
+    @Column()
+    slug: string
+
+    @Column()
+    type: string
+
+    @Column()
+    link: string
 
     @Column({
         type: "text",
@@ -25,12 +29,28 @@ export class Project {
     })
     technologies: string[];
 
-    @Column()
-    status: boolean;
+    @OneToMany(() => ProjectImage, img => img.project, { cascade: true })
+    imgs: ProjectImage[];
 
     @CreateDateColumn()
     createdAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
+}
+
+
+@Entity()
+export class ProjectImage {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column({
+        type: "text"
+    })
+    imgPath: string
+
+    @ManyToOne(() => Project, project => project.imgs, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'project_id' })
+    project: Project;
 }

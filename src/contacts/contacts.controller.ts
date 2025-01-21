@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, UseGuards } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { CustomResponseInterceptor } from '@interceptors';
-import { Images } from '@decorators';
+import { Images, Public } from '@decorators';
 import { SendEmailDto } from './dto/send-email.dto';
 import { Response } from 'express';
-
+import { AuthGuard } from 'guards/auth.guard';
+@UseGuards(AuthGuard)
 @Controller('contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) { }
@@ -15,11 +16,15 @@ export class ContactsController {
   @Post()
   @Images("contact-icons") // accepts a file, saves it to a folder, and passes the filename for saving in the database
   @UseInterceptors(CustomResponseInterceptor) //Uses a custom response interceptor that reacts to the main function's output. If the main function throws an error, it checks if there is an image name and deletes it.
-  async create(@Body() createContactDto: CreateContactDto, @UploadedFile() file: Express.Multer.File) {
+  async createContactLink(
+    @Body() createContactDto: CreateContactDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     await this.contactsService.create(createContactDto, file.filename);
   }
 
   // Retrieve all contacts
+  // @Public()
   @Get()
   async findAll() {
     return await this.contactsService.findAll();

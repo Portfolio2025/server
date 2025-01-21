@@ -6,21 +6,28 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { ServeStaticModule } from '@nestjs/serve-static';
+import { ServeStaticModule, ServeStaticModuleOptions } from '@nestjs/serve-static';
 import { SkillModule } from './skill/skill.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { ProjectsModule } from './projects/projects.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 import * as path from 'path';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-      serveRoot: `/${process.env.API_NAME}/static`,
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService): ServeStaticModuleOptions[] => [{
+        rootPath: join(__dirname, '..', 'public'),
+        serveRoot: `/${configService.get<string>("API_NAME")}/static`,
+      }],
+      inject: [ConfigService]
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -60,8 +67,14 @@ import * as path from 'path';
     HobbyModule,
     SkillModule,
     ContactsModule,
-    ProjectsModule],
+    ProjectsModule,
+    AuthModule,
+    UserModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    JwtService
+  ],
 })
 export class AppModule { }
