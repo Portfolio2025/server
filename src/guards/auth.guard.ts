@@ -22,19 +22,18 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    console.log(request)
     const token = request.cookies['token'];
-    // try {
-    //   const payload = await this.jwt.verifyAsync(
-    //     token,
-    //     {
-    //       secret: this.configService.get('JWT_SECRET'),
-    //     }
-    //   );
-    //   request['user'] = payload;
-    // } catch {
-    //   throw new UnauthorizedException();
-    // }
+    try {
+      const payload = await this.jwt.verifyAsync(
+        token,
+        {
+          secret: this.configService.get('JWT_SECRET'),
+        }
+      );
+      request['user'] = payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
     return true;
   }
 }
