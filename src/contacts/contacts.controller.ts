@@ -24,8 +24,8 @@ export class ContactsController {
   }
 
   // Retrieve all contacts
-  // @Public()
   @Get()
+  @Public()
   async findAll() {
     return await this.contactsService.findAll();
   }
@@ -50,6 +50,7 @@ export class ContactsController {
 
   // Send an email
   @Post('send-email')
+  @Public()
   async sendEmail(@Body() sendEmailDto: SendEmailDto, @Res() res: Response) {
     try {
       await this.contactsService.sendEmail(sendEmailDto);

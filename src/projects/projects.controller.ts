@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UploadedFiles, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Images } from '@decorators';
+import { Images, Public } from '@decorators';
 import { CustomResponseInterceptor } from '@interceptors';
+import { AuthGuard } from 'guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) { }
@@ -27,16 +29,19 @@ export class ProjectsController {
   }
 
   @Get()
+  @Public()
   async findAll() {
     return await this.projectsService.findAll();
   }
 
   @Get('slug/:name')
+  @Public()
   async findOneBySlug(@Param('name') name: string) {
     return await this.projectsService.findOneBySlug(name);
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: number) {
     return this.projectsService.findOne(id);
   }

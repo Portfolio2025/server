@@ -3,6 +3,7 @@ import { HobbyService } from './hobby.service';
 import { HobbyController } from './hobby.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Hobby, Section, Content, TextBlock, Picture } from './entities/hobby.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [HobbyController],

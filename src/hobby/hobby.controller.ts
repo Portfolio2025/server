@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
 import { HobbyService } from './hobby.service';
 import { CreateHobbyDto, CreateHobbySectionDto } from './dto/create-hobby.dto';
 import { UpdateHobbyDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
 import { Response } from 'express';
-import { Images } from '@decorators';
+import { Images, Public } from '@decorators';
 import { CustomResponseInterceptor } from '@interceptors';
-
+import { AuthGuard } from 'guards/auth.guard';
+@UseGuards(AuthGuard)
 @Controller('hobby')
 export class HobbyController {
   constructor(
@@ -30,7 +31,7 @@ export class HobbyController {
   }
 
   // Add an image to a section
-  @Post("/:id/image")
+  @Post("section/:id/image")
   @Images('imgs')
   @UseInterceptors(CustomResponseInterceptor)
   async assImage(
@@ -42,18 +43,21 @@ export class HobbyController {
 
   // Get all hobbies
   @Get()
+  @Public()
   findAll() {
     return this.hobbyService.findAllHobbies();
   }
 
   // Get all tab names
   @Get('/tabs')
+  @Public()
   findTabs() {
     return this.hobbyService.findTabsNames();
   }
 
   // Get a specific hobby by ID
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.hobbyService.findOne(+id);
   }
