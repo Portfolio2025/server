@@ -17,7 +17,7 @@ export class SkillController {
   }
 
   // Add a new skill to a specific group
-  @Post("/:groupId")
+  @Post("group/:groupId")
   createSkill(@Param("groupId") id: number, @Body() createSkillDto: CreateSkillDto) {
     return this.skillService.addSkill(id, createSkillDto);
   }
