@@ -4,15 +4,25 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRep: Repository<User>
-  ){}
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  ) { }
+  
+  async initUser() {
+    const tableLength = await this.userRep.count()
+    if (tableLength === 0) {
+      const user = this.userRep.create({
+        name: "Aleksei Kozlov",
+        email: "aleksei22891@gmail.com",
+        password: await argon2.hash("qwerty")
+      })
+      this.userRep.save(user)
+    }
   }
 
   findAll() {
