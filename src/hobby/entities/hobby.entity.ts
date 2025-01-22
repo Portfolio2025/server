@@ -1,3 +1,4 @@
+import { group } from 'console';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 // Enum for content types
@@ -50,8 +51,8 @@ export class Section {
     hobby: Hobby;
 
     // One-to-many relationship with Content
-    @OneToMany(() => Content, content => content.section, { cascade: true })
-    content: Content[];
+    @OneToMany(() => TextGroups, group => group.section, { cascade: true })
+    content: TextGroups[];
 
     // One-to-many relationship with Picture
     @OneToMany(() => Picture, picture => picture.section, { cascade: true })
@@ -64,8 +65,8 @@ export class Section {
     updatedAt: Date;
 }
 
-@Entity('content')
-export class Content {
+@Entity('text_groups')
+export class TextGroups {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -107,9 +108,9 @@ export class TextBlock {
     order: number
 
     // Many-to-one relationship with Content
-    @ManyToOne(() => Content, content => content.id, { onDelete: 'CASCADE' })
+    @ManyToOne(() => TextGroups, group => group.id, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'content_id' })
-    content: Content;
+    content: TextGroups;
 }
 
 @Entity('pictures')

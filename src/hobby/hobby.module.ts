@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { HobbyService } from './hobby.service';
 import { HobbyController } from './hobby.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Hobby, Section, Content, TextBlock, Picture } from './entities/hobby.entity';
-import { JwtService } from '@nestjs/jwt';
+import { Hobby, Section, TextBlock, Picture, TextGroups } from './entities/hobby.entity';
 
 @Module({
   controllers: [HobbyController],
@@ -12,8 +11,8 @@ import { JwtService } from '@nestjs/jwt';
     TypeOrmModule.forFeature([
       Hobby,
       Section,
-      Content,
       TextBlock,
+      TextGroups,
       Picture,
     ])
   ]

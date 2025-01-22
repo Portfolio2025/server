@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UseGuards, UploadedFiles } from '@nestjs/common';
 import { HobbyService } from './hobby.service';
 import { CreateHobbyDto, CreateHobbySectionDto } from './dto/create-hobby.dto';
 import { UpdateHobbyDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
@@ -18,16 +18,10 @@ export class HobbyController {
   async create(@Body() createHobbyDto: CreateHobbyDto, @Res() res: Response) {
     try {
       await this.hobbyService.createHobby(createHobbyDto);
-      res.status(200).json({ success: true, message: 'Section images added updated successfully' });
+      res.status(200).json({ success: true, message: 'Hobby added' });
     } catch (error) {
       res.status(400).json({ success: false, message: error.message || 'An error occurred' });
     }
-  }
-
-  // Create a new section for a hobby
-  @Post("/:id/section")
-  createSection(@Param("id") id: number, @Body() createSectionDto: CreateHobbySectionDto) {
-    return this.hobbyService.addSection(id, createSectionDto.title);
   }
 
   // Add an image to a section
@@ -36,9 +30,15 @@ export class HobbyController {
   @UseInterceptors(CustomResponseInterceptor)
   async assImage(
     @Param("id") sectionId: number,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    await this.hobbyService.addImage(sectionId, file.filename);
+    await this.hobbyService.addImage(sectionId, files);
+  }
+  
+  // Create a new section for a hobby
+  @Post("/section/:id")
+  async createSection(@Param("id") id: number, @Body() createSectionDto: CreateHobbySectionDto) {
+    return await this.hobbyService.addSection(id, createSectionDto.title);
   }
 
   // Get all hobbies
@@ -62,6 +62,21 @@ export class HobbyController {
     return this.hobbyService.findOne(+id);
   }
 
+  // Update the content of a section
+  @Patch('section/:id/details')
+  async updateSectionDetails(
+    @Param('id') id: number,
+    @Body() updateContentDto: UpdateSectionContentDto,
+    @Res() res: Response
+  ) {
+    try {
+      await this.hobbyService.updateSectionDetails(id, updateContentDto);
+      res.status(200).json({ success: true, message: 'Section content updated successfully' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message || 'An error occurred' });
+    }
+  }
+
   // Update the name of a hobby
   @Patch(':id')
   updateHobbyName(
@@ -69,21 +84,6 @@ export class HobbyController {
     @Body() updateHobbyDto: UpdateHobbyDto
   ) {
     return this.hobbyService.update(+id, updateHobbyDto);
-  }
-
-  // Update the content of a section
-  @Patch('/:id/content')
-  async updateSectionContent(
-    @Param('id') id: number,
-    @Body() updateContentDto: UpdateSectionContentDto,
-    @Res() res: Response
-  ) {
-    try {
-      await this.hobbyService.updateSectionContent(id, updateContentDto);
-      res.status(200).json({ success: true, message: 'Section content updated successfully' });
-    } catch (error) {
-      res.status(400).json({ success: false, message: error.message || 'An error occurred' });
-    }
   }
 
   // Remove a hobby, section, or content

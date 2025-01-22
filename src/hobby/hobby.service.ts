@@ -1,11 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateHobbyDto } from './dto/create-hobby.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Hobby, Section, Content, TextBlock, Picture } from './entities/hobby.entity';
+import { Hobby, Section, TextBlock, Picture, TextGroups } from './entities/hobby.entity';
 import { Repository } from 'typeorm';
 import { UpdateHobbyDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @Injectable()
 export class HobbyService {
@@ -14,8 +12,8 @@ export class HobbyService {
     private hobbyRep: Repository<Hobby>,
     @InjectRepository(Section)
     private sectionRep: Repository<Section>,
-    @InjectRepository(Content)
-    private contentRep: Repository<Content>,
+    @InjectRepository(TextGroups)
+    private groupRep: Repository<TextGroups>,
     @InjectRepository(TextBlock)
     private textRep: Repository<TextBlock>,
     @InjectRepository(Picture)
@@ -38,16 +36,19 @@ export class HobbyService {
     const section = this.sectionRep.create({ title, hobby });
     await this.sectionRep.save(section);
     delete section.hobby;
+    return { status: true, message: `Section added in '${hobby.name}'"`}
   }
 
   // Add an image to a section
-  async addImage(sectionId: number, filename: string) {
+  async addImage(sectionId: number, files: Express.Multer.File[]) {
     const section = await this.sectionRep.findOne({ where: { id: sectionId } });
     if (!section) {
       throw new HttpException(`sectionRep with ID ${sectionId} not found.`, 404);
     }
-    const image = this.pictureRep.create({ path: filename, section });
-    await this.pictureRep.save(image);
+    for (const i of files['uploadImage[]']) {
+      const image = this.pictureRep.create({ path: i.filename, section });
+      await this.pictureRep.save(image);
+    }
   }
 
   // Find all hobbies with their relations
@@ -84,19 +85,7 @@ export class HobbyService {
       ...hobbyDto
     });
   }
-
-  // Update section content
-  async updateSectionContent(_id: number, updateBody: UpdateSectionContentDto) {
-    const section = await this.findSectionById(updateBody.sectionId);
-
-    if (updateBody.contentId === -1) {
-      await this.createNewContent(section, updateBody);
-      return;
-    }
-
-    await this.updateExistingContent(updateBody);
-  }
-
+  
   // Find a section by ID
   private async findSectionById(sectionId: number) {
     const section = await this.sectionRep.findOne({ where: { id: sectionId } });
@@ -104,10 +93,20 @@ export class HobbyService {
     return section;
   }
 
+  // Update section content
+  async updateSectionDetails(id: number, updateBody: UpdateSectionContentDto) {
+    const section = await this.findSectionById(id);
+    if (updateBody.groupId === -1) {
+      await this.createNewGroup(section, updateBody);
+      return;
+    }
+    await this.updateExistingGroup(updateBody);
+  }
+  
   // Create new content for a section
-  private async createNewContent(section: Section, updateBody: UpdateSectionContentDto) {
-    const content = this.contentRep.create({ section, type: updateBody.contentType });
-    await this.contentRep.save(content);
+  private async createNewGroup(section: Section, updateBody: UpdateSectionContentDto) {
+    const content = this.groupRep.create({ section, type: updateBody.contentType });
+    await this.groupRep.save(content);
 
     // Create and save new text blocks for the content
     const detailsArray = updateBody.details.map(detail =>
@@ -117,9 +116,9 @@ export class HobbyService {
   }
 
   // Update existing content
-  private async updateExistingContent(updateBody: UpdateSectionContentDto) {
-    const content = await this.contentRep.findOne({ where: { id: updateBody.contentId }, relations: ['details'] });
-    if (!content) throw new Error(`contentRep with ID ${updateBody.contentId} not found.`);
+  private async updateExistingGroup(updateBody: UpdateSectionContentDto) {
+    const content = await this.groupRep.findOne({ where: { id: updateBody.groupId }, relations: ['details'] });
+    if (!content) throw new Error(`groupRep with ID ${updateBody.groupId} not found.`);
 
     const existingTexts = content.details || [];
     const newTexts = updateBody.details;
@@ -133,7 +132,7 @@ export class HobbyService {
   private async handleNewOrUpdatedTexts(
     existingTexts: TextBlock[],
     newTexts: { id?: number, text: string }[],
-    content: Content
+    content: TextGroups
   ) {
     for (const frontDetail of newTexts) {
       const existingText = existingTexts.find(text => text.id === frontDetail.id);
@@ -168,7 +167,7 @@ export class HobbyService {
     const entityMap = {
       hobby: this.hobbyRep,
       section: this.sectionRep,
-      content: this.contentRep,
+      content: this.groupRep,
     };
 
     const repository = entityMap[type];
