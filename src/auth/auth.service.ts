@@ -9,13 +9,14 @@ export class AuthService {
         private readonly jwt: JwtService
     ) { }
     async signIn(username: string, pass: string): Promise<any> {
-        const user = await this.usersService.findOneByPayload({name: username});
-        if (await argon2.verify(user.password, pass)) {
+        const user = await this.usersService.findOneByPayload([
+            { name: username },
+            { email: username }
+        ]);
+        if (!await argon2.verify(user.password, pass)) {
             throw new UnauthorizedException();
         }
         const payload = { sub: user.id, username: user.name };
-        return {
-            access_token: await this.jwt.signAsync(payload),
-        };
+        return await this.jwt.signAsync(payload)
     }
 }
