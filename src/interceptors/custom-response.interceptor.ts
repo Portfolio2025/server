@@ -21,9 +21,11 @@ export class CustomResponseInterceptor implements NestInterceptor {
       // Catch and handle errors
       catchError((err) => {
         // If there is an uploaded file and it exists, delete it
-        const filePath = request.file?.path;
-        if (filePath && fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
+        const files = request.files;
+        for (let i of files['uploadImage[]']) {
+          if (i.path && fs.existsSync(i.path)) {
+            fs.unlinkSync(i.path);
+          }
         }
         // Send error response
         response.status(err.status || 400).json({

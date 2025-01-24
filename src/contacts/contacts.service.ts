@@ -18,10 +18,10 @@ export class ContactsService {
   ) { }
 
   // Create a new contact with the provided data and file name
-  async create(createContactDto: CreateContactDto, fileName: string) {
+  async create(createContactDto: CreateContactDto, files: Express.Multer.File[]) {
     const contact = this.contactsRep.create({
       ...createContactDto,
-      icon: fileName
+      icon: files['uploadImage[]'].pop().filename
     });
     await this.contactsRep.save(contact);
   }

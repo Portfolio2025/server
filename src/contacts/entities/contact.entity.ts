@@ -11,9 +11,6 @@ export class Contacts {
     @PrimaryGeneratedColumn()
     id: number; // Primary key
 
-    @Column({ nullable: false })
-    title: string; // Title of the contact
-
     @Column({
         type: 'enum',
         enum: ContactsType,
