@@ -15,6 +15,8 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import * as path from 'path';
 import { JwtService } from '@nestjs/jwt';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -42,6 +44,16 @@ import { JwtService } from '@nestjs/jwt';
         synchronize: true,
       }),
       inject: [ConfigService]
+    }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get('THROTTLE_TTL'),
+          limit: config.get('THROTTLE_LIMIT'), 
+        },
+      ],
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule], // подключаем ConfigModule для использования ConfigService
@@ -74,7 +86,11 @@ import { JwtService } from '@nestjs/jwt';
   controllers: [AppController],
   providers: [
     AppService,
-    JwtService
+    JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule { }

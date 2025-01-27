@@ -5,6 +5,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Images, Public } from '@decorators';
 import { CustomResponseInterceptor } from '@interceptors';
 import { AuthGuard } from 'guards/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -30,12 +31,14 @@ export class ProjectsController {
 
   @Get()
   @Public()
+  @SkipThrottle()
   async findAll() {
     return await this.projectsService.findAll();
   }
 
   @Get('slug/:name')
   @Public()
+  @SkipThrottle()
   async findOneBySlug(@Param('name') name: string) {
     return await this.projectsService.findOneBySlug(name);
   }

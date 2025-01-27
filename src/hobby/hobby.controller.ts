@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { Images, Public } from '@decorators';
 import { CustomResponseInterceptor } from '@interceptors';
 import { AuthGuard } from 'guards/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 @UseGuards(AuthGuard)
 @Controller('hobby')
 export class HobbyController {
@@ -44,6 +45,7 @@ export class HobbyController {
   // Get all hobbies
   @Get()
   @Public()
+  @SkipThrottle()
   findAll() {
     return this.hobbyService.findAllHobbies();
   }
@@ -51,6 +53,7 @@ export class HobbyController {
   // Get all tab names
   @Get('/tabs')
   @Public()
+  @SkipThrottle()
   findTabs() {
     return this.hobbyService.findTabsNames();
   }

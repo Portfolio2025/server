@@ -4,6 +4,7 @@ import { CreateSkillDto, CreateSkillGroupDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { AuthGuard } from 'guards/auth.guard';
 import { Public } from '@decorators';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard)
 @Controller('skill')
@@ -24,6 +25,7 @@ export class SkillController {
 
   // Retrieve all skills
   @Get()
+  @SkipThrottle()
   @Public()
   findAll() {
     return this.skillService.findAll();

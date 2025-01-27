@@ -7,6 +7,7 @@ import { Images, Public } from '@decorators';
 import { SendEmailDto } from './dto/send-email.dto';
 import { Response } from 'express';
 import { AuthGuard } from 'guards/auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 @UseGuards(AuthGuard)
 @Controller('contacts')
 export class ContactsController {
@@ -26,6 +27,7 @@ export class ContactsController {
 	// Retrieve all contacts
 	@Get()
 	@Public()
+	@SkipThrottle()
 	async findAll() {
 		return await this.contactsService.findAll();
 	}
