@@ -3,8 +3,8 @@ import { CreateContentTextDto, CreateHobbyDto, CreateHobbySectionDto, CreateSect
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ContentType } from '../entities/hobby.entity';
 
-export class UpdateHobbyDto extends PartialType(CreateHobbyDto) {
-}
+export class UpdateHobbyDto extends PartialType(CreateHobbyDto) { }
+export class UpdateHobbySectionDto extends PartialType(CreateHobbySectionDto) { }
 
 export class UpdateSectionContentDto {
 

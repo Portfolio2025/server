@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SkillService } from './skill.service';
 import { SkillController } from './skill.controller';
-import { ProjectLink, Skill, SkillGroup } from './entities/skill.entity';
+import { SkillProjectLink, Skill, SkillGroup } from './entities/skill.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -11,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forFeature([
       Skill,
       SkillGroup,
-      ProjectLink,
+      SkillProjectLink,
     ])
   ]
 })

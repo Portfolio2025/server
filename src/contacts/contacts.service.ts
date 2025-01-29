@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Contacts } from './entities/contact.entity';
 import { SendEmailDto } from './dto/send-email.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ContactsService {
@@ -37,13 +39,29 @@ export class ContactsService {
   }
 
   // Update a contact by its ID with the provided data
-  update(id: number, _updateContactDto: UpdateContactDto) {
-    return `This action updates a #${id} contact`;
+  async update(id: number, updateContactDto: UpdateContactDto) {
+    const contact = await this.contactsRep.findOne({ where: { id } })
+    if (!contact) {
+      throw new NotFoundException('Object not found for update');
+    }
+    await this.contactsRep.update(contact.id, {
+      ...updateContactDto
+    })
   }
 
   // Remove a contact by its ID
-  remove(id: number) {
-    return `This action removes a #${id} contact`;
+  async remove(id: number) {
+    const contact = await this.contactsRep.findOne({ where: { id } })
+    if (!contact) {
+      throw new NotFoundException('Object not found for update');
+    }
+    const iconPath = path.join(__dirname, `../../public/contact-icons/${contact.icon}`)
+    try {
+      await fs.promises.unlink(iconPath)
+    } catch (error) {
+      throw new NotFoundException('Object not found for delete icon');
+    }
+    await this.contactsRep.delete(contact)
   }
 
   // Send an email using the provided form data

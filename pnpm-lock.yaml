@@ -50,9 +50,6 @@ importers:
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
-      csrf-csrf:
-        specifier: ^3.1.0
-        version: 3.1.0
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -1598,9 +1595,6 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
-
-  csrf-csrf@3.1.0:
-    resolution: {integrity: sha512-kZacFfFbdYFxNnFdigRHCzVAq019vJyUUtgPLjCtzh6jMXcWmf8bGUx/hsqtSEMXaNcPm8iXpjC+hW5aeOsRMg==}
 
   css-select@5.1.0:
     resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
@@ -5894,10 +5888,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  csrf-csrf@3.1.0:
-    dependencies:
-      http-errors: 2.0.0
 
   css-select@5.1.0:
     dependencies:

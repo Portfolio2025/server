@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateSkillDto, CreateSkillGroupDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
-import { ProjectLink, Skill, SkillGroup } from './entities/skill.entity';
+import { SkillProjectLink, Skill, SkillGroup } from './entities/skill.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -12,8 +12,8 @@ export class SkillService {
     private groupRep: Repository<SkillGroup>,
     @InjectRepository(Skill)
     private skillRep: Repository<Skill>,
-    @InjectRepository(ProjectLink)
-    private linkRep: Repository<ProjectLink>,
+    @InjectRepository(SkillProjectLink)
+    private projectLinkRep: Repository<SkillProjectLink>,
   ) { }
 
   // Create a new skill group

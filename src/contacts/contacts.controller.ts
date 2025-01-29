@@ -40,14 +40,14 @@ export class ContactsController {
 
 	// Update a contact by ID
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateContactDto: UpdateContactDto) {
-		return this.contactsService.update(+id, updateContactDto);
+	async update(@Param('id') id: string, @Body() updateContactDto: UpdateContactDto) {
+		return await this.contactsService.update(+id, updateContactDto);
 	}
 
 	// Delete a contact by ID
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.contactsService.remove(+id);
+	async remove(@Param('id') id: string) {
+		return await this.contactsService.remove(+id);
 	}
 
 	// Send an email

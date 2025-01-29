@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { UserService } from 'user/user.service';
-import { doubleCsrf, DoubleCsrfConfigOptions } from 'csrf-csrf';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestApplication>(AppModule);
@@ -25,24 +24,24 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const doubleCsrfOptions:DoubleCsrfConfigOptions = {
-    getSecret: () => configService.get<string>("CSRF_SECRET") || 'default_secret',
-    cookieName: 'XSRF-TOKEN', 
-    cookieOptions: {
-      httpOnly: true,
-      secure: configService.get<string>("NODE_ENV ") === 'production',
-      sameSite: 'strict',
-      path: '/',
-    },
-    size: 64,
-  };
-  const {
-    invalidCsrfTokenError,
-    generateToken,
-    validateRequest,
-    doubleCsrfProtection,
-  } = doubleCsrf(doubleCsrfOptions);
-  app.use(doubleCsrfProtection);
+  // const doubleCsrfOptions:DoubleCsrfConfigOptions = {
+  //   getSecret: () => configService.get<string>("CSRF_SECRET") || 'default_secret',
+  //   cookieName: configService.get<string>("CSRF_TOKEN_NAME"), 
+  //   cookieOptions: {
+  //     httpOnly: true,
+  //     secure: configService.get<string>("NODE_ENV") === 'production',
+  //     sameSite: 'lax',
+  //     path: '/',
+  //   },
+  //   ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+  //   getTokenFromRequest: (req) => req.cookies[configService.get<string>("CSRF_TOKEN_NAME")],
+  //   size: 64,
+  // };
+  // const {
+  //   validateRequest,
+  //   doubleCsrfProtection,
+  // } = doubleCsrf(doubleCsrfOptions);
+  // app.use(doubleCsrfProtection);
 
   await app.listen(3000);
 }

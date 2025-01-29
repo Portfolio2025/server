@@ -1,9 +1,11 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateHobbyDto } from './dto/create-hobby.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hobby, Section, TextBlock, Picture, TextGroups } from './entities/hobby.entity';
 import { Repository } from 'typeorm';
-import { UpdateHobbyDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
+import { UpdateHobbyDto, UpdateHobbySectionDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class HobbyService {
@@ -30,20 +32,20 @@ export class HobbyService {
   async addSection(id: number, title: string) {
     const hobby = await this.hobbyRep.findOne({ where: { id } });
     if (!hobby) {
-      throw new Error(`hobbyRep with ID ${id} not found.`);
+      throw new NotFoundException(`hobbyRep with ID ${id} not found.`);
     }
 
     const section = this.sectionRep.create({ title, hobby });
     await this.sectionRep.save(section);
     delete section.hobby;
-    return { status: true, message: `Section added in '${hobby.name}'"`}
+    return { status: true, message: `Section added in '${hobby.name}'"` }
   }
 
   // Add an image to a section
   async addImage(sectionId: number, files: Express.Multer.File[]) {
     const section = await this.sectionRep.findOne({ where: { id: sectionId } });
     if (!section) {
-      throw new HttpException(`sectionRep with ID ${sectionId} not found.`, 404);
+      throw new NotFoundException(`sectionRep with ID ${sectionId} not found.`);
     }
     for (const i of files['uploadImage[]']) {
       const image = this.pictureRep.create({ path: i.filename, section });
@@ -77,20 +79,30 @@ export class HobbyService {
   async update(id: number, hobbyDto: UpdateHobbyDto) {
     const hobby = await this.hobbyRep.findOne({ where: { id } });
     if (!hobby) {
-      throw new Error(`hobbyRep with ID ${id} not found.`);
+      throw new NotFoundException(`hobby with ID ${id} not found.`);
     }
 
     return await this.hobbyRep.update(hobby.id, {
-      id: hobby.id,
       ...hobbyDto
     });
   }
-  
+
   // Find a section by ID
   private async findSectionById(sectionId: number) {
     const section = await this.sectionRep.findOne({ where: { id: sectionId } });
-    if (!section) throw new Error(`sectionRep with ID ${sectionId} not found.`);
+    if (!section) throw new NotFoundException(`sectionRep with ID ${sectionId} not found.`);
     return section;
+  }
+
+  async updateSection(id: number, sectionDto: UpdateHobbySectionDto) {
+    const section = await this.sectionRep.findOne({ where: { id } });
+    if (!section) {
+      throw new NotFoundException(`section with ID ${id} not found.`);
+    }
+
+    return await this.sectionRep.update(section.id, {
+      ...sectionDto
+    });
   }
 
   // Update section content
@@ -102,7 +114,7 @@ export class HobbyService {
     }
     await this.updateExistingGroup(updateBody);
   }
-  
+
   // Create new content for a section
   private async createNewGroup(section: Section, updateBody: UpdateSectionContentDto) {
     const content = this.groupRep.create({ section, type: updateBody.contentType });
@@ -118,8 +130,7 @@ export class HobbyService {
   // Update existing content
   private async updateExistingGroup(updateBody: UpdateSectionContentDto) {
     const content = await this.groupRep.findOne({ where: { id: updateBody.groupId }, relations: ['details'] });
-    if (!content) throw new Error(`groupRep with ID ${updateBody.groupId} not found.`);
-
+    if (!content) throw new NotFoundException(`group with ID ${updateBody.groupId} not found.`);
     const existingTexts = content.details || [];
     const newTexts = updateBody.details;
 
@@ -171,10 +182,28 @@ export class HobbyService {
     };
 
     const repository = entityMap[type];
-    if (!repository) throw new Error(`Unknown type: ${type}`);
+    if (!repository) throw new NotFoundException(`Unknown type: ${type}`);
 
     const entity = await repository.findOne({ where: { id } });
-    if (!entity) throw new Error(`${type.toUpperCase()} with ID ${id} not found.`);
+    if (!entity) throw new NotFoundException(`${type.toUpperCase()} with ID ${id} not found.`);
+
+    if (type === "section" || type === "hobby") {
+      const sections = type === "hobby"
+        ? await this.sectionRep.find({ where: { hobby: { id } }, relations: ["pictures"] })
+        : [await this.sectionRep.findOne({ where: { id }, relations: ["pictures"] })];
+
+      for (const section of sections) {
+        if (section) {
+          for (const dbFile of section.pictures) {
+            const sectionPicturePath = path.join(__dirname, `../../public/imgs/${dbFile.path}`);
+            try {
+              await fs.promises.unlink(sectionPicturePath);
+            } catch (error) {
+            }
+          }
+        }
+      }
+    }
 
     await repository.delete(id);
   }

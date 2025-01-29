@@ -20,7 +20,7 @@ export class Contacts {
     type: ContactsType; // Type of the contact (text or link)
 
     @Column({ type: "text", nullable: false })
-    link: string; // Link associated with the contact
+    label: string; // Link associated with the contact
 
     @Column({ type: "text", nullable: false })
     icon: string; // Icon associated with the contact

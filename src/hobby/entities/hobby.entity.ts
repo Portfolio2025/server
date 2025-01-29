@@ -34,7 +34,7 @@ export class Hobby {
     updatedAt: Date;
 }
 
-@Entity('sections')
+@Entity('hobby_sections')
 export class Section {
     @PrimaryGeneratedColumn()
     id: number;
@@ -67,7 +67,7 @@ export class Section {
 
 @Entity('text_groups')
 export class TextGroups {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn() 
     id: number;
 
     @Column({
@@ -96,7 +96,7 @@ export class TextGroups {
     updatedAt: Date;
 }
 
-@Entity('texts')
+@Entity('group_text')
 export class TextBlock {
     @PrimaryGeneratedColumn()
     id: number;
@@ -109,16 +109,16 @@ export class TextBlock {
 
     // Many-to-one relationship with Content
     @ManyToOne(() => TextGroups, group => group.id, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'content_id' })
+    @JoinColumn({ name: 'details_id' })
     content: TextGroups;
 }
 
-@Entity('pictures')
+@Entity('section_pictures')
 export class Picture {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column() 
     path: string;
 
     // Many-to-one relationship with Section

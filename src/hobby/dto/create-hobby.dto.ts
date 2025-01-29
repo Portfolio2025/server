@@ -1,4 +1,4 @@
-import { IsAlpha, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsAlpha, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ContentType } from '../entities/hobby.entity';
 
 // DTO for creating a hobby
@@ -18,6 +18,7 @@ export class CreateHobbySectionDto {
     @IsString() // Ensures the title is a string
     title: string
 
+    @IsOptional()
     @IsNumber() // Ensures the order is a number
     order?: number
 }
@@ -28,6 +29,7 @@ export class CreateSectionContentDto {
     @IsEnum(ContentType) // Ensures the type is a valid enum value
     type: ContentType
 
+    @IsOptional()
     @IsNumber() // Ensures the order is a number
     order?: number
 
@@ -42,6 +44,7 @@ export class CreateContentTextDto {
     @IsString() // Ensures the text is a string
     text: string
 
+    @IsOptional()
     @IsNumber() // Ensures the order is a number
     order?: number
 

@@ -35,8 +35,8 @@ export class Skill {
     @Column()
     skill_point: number
 
-    @OneToMany(() => ProjectLink, links => links.skill, { cascade: true })
-    links: ProjectLink[];
+    @OneToMany(() => SkillProjectLink, links => links.skill, { cascade: true })
+    links: SkillProjectLink[];
 
     @ManyToOne(() => SkillGroup, group => group.skills, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'skill_group_id' })
@@ -49,7 +49,7 @@ export class Skill {
     updatedAt: Date;
 }
 @Entity()
-export class ProjectLink {
+export class SkillProjectLink {
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -1,9 +1,11 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project, ProjectImage } from './entities/project.entity';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ProjectsService {
@@ -27,7 +29,7 @@ export class ProjectsService {
       }
     })
     if (!project) {
-      throw new HttpException(`Project by ${projectId} ID not found`, 404)
+      throw new NotFoundException(`Project by ${projectId} ID not found`)
     }
     for (let i of filenames['uploadImage[]']) {
       const img = this.imageRep.create({
@@ -55,11 +57,44 @@ export class ProjectsService {
     });
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async updateProject(id: number, updateProjectDto: UpdateProjectDto) {
+    const project = await this.projectRep.findOne({ where: { id } })
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found.`)
+    }
+    this.projectRep.update(id, {
+      ...updateProjectDto
+    })
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async removeProject(id: number) {
+    const project = await this.projectRep.findOne({
+      where: { id },
+      relations: ["imgs"]
+    })
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found.`)
+    }
+    for (const img of project.imgs) {
+      const projectPicturePath = path.join(__dirname, `../../public/projectImages/${img.imgPath}`);
+      try {
+        await fs.promises.unlink(projectPicturePath);
+      } catch (error) {
+      }
+    }
+    await this.projectRep.delete(project.id)
+  }
+  async removePicture(id: number) {
+    const img = await this.imageRep.findOne({ where: { id } })
+    if (!img) {
+      throw new NotFoundException(`Image with ID ${id} not found.`)
+    }
+    const projectPicturePath = path.join(__dirname, `../../public/projectImages/${img.imgPath}`);
+    try {
+      await fs.promises.unlink(projectPicturePath);
+    } catch (error) {
+    }
+    this.imageRep.delete(img.id)
   }
 }

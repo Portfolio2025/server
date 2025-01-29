@@ -19,7 +19,8 @@ export class ProjectsController {
     @Param("projectId") projectId: number,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
-    this.projectsService.addImage(projectId, files)
+    await this.projectsService.addImage(projectId, files)
+    
   }
 
   @Post()
@@ -50,12 +51,17 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(+id, updateProjectDto);
+  async update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
+    await this.projectsService.updateProject(+id, updateProjectDto);
+  }
+
+  @Delete('image/:id')
+  async removeImg(@Param('id') id: string) {
+    await this.projectsService.removePicture(+id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.projectsService.removeProject(+id);
   }
 }

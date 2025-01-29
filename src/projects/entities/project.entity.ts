@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-@Entity()
+@Entity('projects')
 export class Project {
     @PrimaryGeneratedColumn()
     id: number
@@ -40,7 +40,7 @@ export class Project {
 }
 
 
-@Entity()
+@Entity('projects_images')
 export class ProjectImage {
     @PrimaryGeneratedColumn()
     id: number
@@ -53,4 +53,4 @@ export class ProjectImage {
     @ManyToOne(() => Project, project => project.imgs, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'project_id' })
     project: Project;
-}
+} 

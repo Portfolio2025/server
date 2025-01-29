@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UseGuards, UploadedFiles } from '@nestjs/common';
 import { HobbyService } from './hobby.service';
 import { CreateHobbyDto, CreateHobbySectionDto } from './dto/create-hobby.dto';
-import { UpdateHobbyDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
+import { UpdateHobbyDto, UpdateHobbySectionDto, UpdateSectionContentDto } from './dto/update-hobby.dto';
 import { Response } from 'express';
 import { Images, Public } from '@decorators';
 import { CustomResponseInterceptor } from '@interceptors';
@@ -35,7 +35,7 @@ export class HobbyController {
   ) {
     await this.hobbyService.addImage(sectionId, files);
   }
-  
+
   // Create a new section for a hobby
   @Post("/section/:id")
   async createSection(@Param("id") id: number, @Body() createSectionDto: CreateHobbySectionDto) {
@@ -61,8 +61,24 @@ export class HobbyController {
   // Get a specific hobby by ID
   @Get(':id')
   @Public()
+  @SkipThrottle()
   findOne(@Param('id') id: string) {
     return this.hobbyService.findOne(+id);
+  }
+
+  // Update the content of a section
+  @Patch('section/:id')
+  async updateSection(
+    @Param('id') id: number,
+    @Body() updateSectionDto: UpdateHobbySectionDto,
+    @Res() res: Response
+  ) {
+    try {
+      await this.hobbyService.updateSection(id, updateSectionDto);
+      res.status(200).json({ success: true, message: 'Section title updated successfully' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message || 'An error occurred' });
+    }
   }
 
   // Update the content of a section
