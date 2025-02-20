@@ -12,7 +12,7 @@ export class CreateContactDto {
 
     // Link or value of the contact, must match the specified regex pattern
     @IsNotEmpty()
-    link: string;
+    label: string;
 
     // Order of the contact, must be a number
     @IsNumber()

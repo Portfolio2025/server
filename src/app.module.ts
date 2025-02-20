@@ -56,10 +56,10 @@ import { APP_GUARD } from '@nestjs/core';
       ],
     }),
     MailerModule.forRootAsync({
-      imports: [ConfigModule], // подключаем ConfigModule для использования ConfigService
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         transport: {
-          service: configService.get<string>('MAIL_SERVICE'), // получаем значения из конфигурации
+          service: configService.get<string>('MAIL_SERVICE'),
           port: configService.get<number>('MAIL_PORT'),
           auth: {
             user: configService.get<string>('MAIL_USER'),
@@ -74,7 +74,7 @@ import { APP_GUARD } from '@nestjs/core';
           adapter: new EjsAdapter(),
         },
       }),
-      inject: [ConfigService], // инжектируем ConfigService
+      inject: [ConfigService],
     }),
     HobbyModule,
     SkillModule,
