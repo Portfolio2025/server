@@ -188,23 +188,27 @@ export class HobbyService {
     if (!entity) throw new NotFoundException(`${type.toUpperCase()} with ID ${id} not found.`);
 
     if (type === "section" || type === "hobby") {
-      const sections = type === "hobby"
-        ? await this.sectionRep.find({ where: { hobby: { id } }, relations: ["pictures"] })
-        : [await this.sectionRep.findOne({ where: { id }, relations: ["pictures"] })];
+      await this.removeSectionPictures(id, type);
+    }
 
-      for (const section of sections) {
-        if (section) {
-          for (const dbFile of section.pictures) {
-            const sectionPicturePath = path.join(__dirname, `../../public/imgs/${dbFile.path}`);
-            try {
-              await fs.promises.unlink(sectionPicturePath);
-            } catch (error) {
-            }
+    await repository.delete(id);
+  }
+
+  private async removeSectionPictures(id: number, type: "hobby" | "section") {
+    const sections = type === "hobby"
+      ? await this.sectionRep.find({ where: { hobby: { id } }, relations: ["pictures"] })
+      : [await this.sectionRep.findOne({ where: { id }, relations: ["pictures"] })];
+
+    for (const section of sections) {
+      if (section) {
+        for (const dbFile of section.pictures) {
+          const sectionPicturePath = path.join(__dirname, `../../public/imgs/${dbFile.path}`);
+          try {
+            await fs.promises.unlink(sectionPicturePath);
+          } catch (error) {
           }
         }
       }
     }
-
-    await repository.delete(id);
   }
 }
